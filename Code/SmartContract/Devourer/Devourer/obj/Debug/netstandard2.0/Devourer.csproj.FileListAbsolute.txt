@@ -1,0 +1,11 @@
+/Users/danielpan/Projects/BlockhainProjects/Competitions/NEOGameDevourer/Code/SmartContract/Devourer/Devourer/obj/Debug/netstandard2.0/Devourer.csprojResolveAssemblyReference.cache
+/Users/danielpan/Projects/BlockhainProjects/Competitions/NEOGameDevourer/Code/SmartContract/Devourer/Devourer/obj/Debug/netstandard2.0/Devourer.csproj.CoreCompileInputs.cache
+/Users/danielpan/Projects/BlockhainProjects/Competitions/NEOGameDevourer/Code/SmartContract/Devourer/Devourer/obj/Debug/netstandard2.0/Devourer.AssemblyInfoInputs.cache
+/Users/danielpan/Projects/BlockhainProjects/Competitions/NEOGameDevourer/Code/SmartContract/Devourer/Devourer/obj/Debug/netstandard2.0/Devourer.AssemblyInfo.cs
+/Users/danielpan/Projects/BlockhainProjects/Competitions/NEOGameDevourer/Code/SmartContract/Devourer/Devourer/bin/Debug/netstandard2.0/Devourer.deps.json
+/Users/danielpan/Projects/BlockhainProjects/Competitions/NEOGameDevourer/Code/SmartContract/Devourer/Devourer/bin/Debug/netstandard2.0/Devourer.dll
+/Users/danielpan/Projects/BlockhainProjects/Competitions/NEOGameDevourer/Code/SmartContract/Devourer/Devourer/bin/Debug/netstandard2.0/Devourer.pdb
+/Users/danielpan/Projects/BlockhainProjects/Competitions/NEOGameDevourer/Code/SmartContract/Devourer/Devourer/bin/Debug/netstandard2.0/Neo.SmartContract.Framework.dll
+/Users/danielpan/Projects/BlockhainProjects/Competitions/NEOGameDevourer/Code/SmartContract/Devourer/Devourer/bin/Debug/netstandard2.0/Neo.SmartContract.Framework.pdb
+/Users/danielpan/Projects/BlockhainProjects/Competitions/NEOGameDevourer/Code/SmartContract/Devourer/Devourer/obj/Debug/netstandard2.0/Devourer.dll
+/Users/danielpan/Projects/BlockhainProjects/Competitions/NEOGameDevourer/Code/SmartContract/Devourer/Devourer/obj/Debug/netstandard2.0/Devourer.pdb
