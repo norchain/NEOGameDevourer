@@ -51,6 +51,8 @@
 
 Email: [info@norchian.io](mailto:info@norchian.io)
 
-开发者主页：[norchain.io](https://github.com/norchain/NEOGameComp/blob/master/norchain.io)
+开发者主页: [norchain.io](https://github.com/norchain/NEOGameDevourer)
 
-开发者邮箱：[rct1985@qq.com](mailto:rct1985@qq.com)
+开发者邮箱: [rct1985@qq.com](mailto:rct1985@qq.com)
+
+试玩地址: [Devourer](http://www.norchain.io/neodevourer/)
