@@ -6,7 +6,7 @@
 
 《吞噬者》的开发团队诺链[norchain.io](https://github.com/norchain/NEOGameComp/blob/master/norchain.io)是总部位于加拿大多伦多的区块链技术兴趣小组，成员主要来自于加拿大、美国、中国及印度，拥有丰富的区块链应用研发经验以及手游开发经验。
 
-![award](Artwork/award.jpg)
+![award](Artwork/AwardNEO.jpg)
 
 ## 玩法说明
 
