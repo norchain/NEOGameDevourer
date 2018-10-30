@@ -1,6 +1,7 @@
 ﻿using System;
 using Neo.SmartContract.Framework;
 using Neo.SmartContract.Framework.Services.Neo;
+using Neo.SmartContract.Framework.Services.System;
 using Helper = Neo.SmartContract.Framework.Helper;
 using System.Text;
 
@@ -9,278 +10,145 @@ using System.Numerics;
 using System.Collections.Generic;
 
 
-namespace Devourer
+namespace SC
 {
-	public class Devourer: SmartContract
+
+
+    public class Class : SmartContract
     {
-
-		public static class Const{
-			public const int blocksPerMove = 5;
-			public const int limitPlayer = 30;
-
-		}
-
-		public static class Color{
-			public const byte Yellow = 0;
-			public const byte Purple = 1;
-			public const byte White = 2;
-			public const byte Green = 3;
-		}
-
-
-
-		public class Pos{
-			public byte x;
-			public byte y;
-
-		}
-
-		public class Cell{
-			public Pos pos;
-			public byte type;
-		}
-      
-
-		public class User{
-			public BigInteger warID;
-			public byte color;
-			public Cell[] cells;
-			public byte[] address;
-			public BigInteger score;
-		}
-
-		public class War{
-			public BigInteger[] users;
-			public byte[] awardFactor; 
-		}
-
-
-        
-
-
-		public static byte[] Serialize(Pos pos)
+        [Serializable]
+        public class Card
         {
-			//[TODO]
-            return new byte[10];
-
+            public byte[] id;
+            public BigInteger lvl;
+            public byte[] ownerId;
         }
 
-		public static byte[] Serialize(Cell cell)
-        {
-			//[TODO]
-            return new byte[10];
+        private static readonly byte[] GAS_ID = { 231, 45, 40, 105, 121, 238, 108, 177, 183, 230, 93, 253, 223, 178, 227, 132, 16, 11, 141, 20, 142, 119, 88, 222, 66, 228, 22, 139, 113, 121, 44, 96 };
 
+
+        public static byte[] GetTransReceiver()
+        {
+            return ExecutionEngine.ExecutingScriptHash;
         }
 
-		public static byte[] Serialize(User user)
+        public static byte[] GetTransSender()
         {
-			//[TODO]
-            return new byte[10];
-
+            Transaction tx = (Transaction)ExecutionEngine.ScriptContainer;
+            TransactionInput[] inputs = tx.GetInputs();
+            if (inputs.Length > 0)
+                return inputs[0].p;
+            return null;
         }
 
-		public static byte[] Serialize(War war)
+        public static BigInteger GetGASAttached()
         {
-			//[TODO]
-            return new byte[10];
-
-        }
-
-  
-		public static Pos DeserializeToPos(byte[] data)
-        {
-			Pos pos = new Pos();
-			pos.x = data[0];
-			pos.y = data[1];
-            return pos;
-        }
-  
-
-		public static Cell DeserializeToCell(byte[] data)
-        {
-			//[TODO]
-			Cell cell = new Cell();
-			cell.pos = DeserializeToPos(data);
-			return cell;
-        }
-
-
-		public static User DeserializeToUser(byte[] data)
-        {
-			//[TODO]
-			User user = new User();
-			user.address = "1010101".HexToBytes();
-			return user;
-        }
-
-		public static War DeserializeToQuestion(byte[] data)
-        {
-			//[TODO]
-			War war = new War();
-			war.awardFactor = data;
-			return war;
-        }
-
-        
-
-
-		private static User[] FindAllUsers(War war){
-			BigInteger[] userIds = war.users;
-			User[] users = new User[userIds.Length];
-			for (int i = 0; i < userIds.Length; i++){
-				User user = GetUser(war,userIds[i]);
-				users[i] = user;
-			}
-			return users;
-		}
-
-
-		private static bool IsUserInWar(War war, byte[] address)
-        {
-            User[] users = FindAllUsers(war);
-            for (int i = 0; i < users.Length; i++)
+            Transaction tx = (Transaction)ExecutionEngine.ScriptContainer;
+            foreach (TransactionOutput output in tx.GetOutputs())
             {
-                if (users[i].address == address)
+                if (output.ScriptHash == ExecutionEngine.ExecutingScriptHash
+                    && output.AssetId == GAS_ID)
+                    return output.Value;
+            }
+            return 0;
+        }
+
+        public static byte[] GetTxHashForRandomness()
+        {
+            //[Modify] Randomness by the txid as we discussed yesterday (Blockchain.GetTransaction())
+            Transaction tx = (Transaction)ExecutionEngine.ScriptContainer;
+            return tx.Hash;
+        }
+
+        public static readonly BigInteger TokenPerGas = 100;
+        public static readonly byte[] Owner = "AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y".ToScriptHash();
+
+        public static object Main(string op, params object[] args)
+        {
+            if (Runtime.Trigger == TriggerType.Verification)
+            {
+                if (op == "buyToken")
                 {
-                    return true;
+                    byte[] receiver = GetTransReceiver();
+                    if (receiver == Owner)
+                    {
+                        return BuyToken();
+                    }
+                    else
+                    {
+                        return false;
+                    }
+
                 }
             }
-            return false;
-        }
-
-		private static bool IsUserInWar(War war, User user){
-			return IsUserInWar(war, user.address);
-		}
-
-		private static Cell[] FindAllCells(War war){
-			User[] users = FindAllUsers(war);
-			int num = 0;
-			for (int i = 0; i < users.Length; i ++){
-				num = num + users[i].cells.Length;
-			}
-            
-
-            
-			Cell[] cells = new Cell[num];
-			int k = 0;
-			for (int i = 0; i < users.Length; i++)
+            if (Runtime.Trigger == TriggerType.Application)
             {
-				User user = users[i];
-				for (int j = 0; j < user.cells.Length; i++){
-					Cell cell = user.cells[j];
-					cells[k] = cell;
-					++k;
-				}
 
-            }
-			return cells;
-            
-		}
-        
-		private static Cell[] FindCellsAround (War war, Pos pos){
-			//TODO
-			Cell[] cells = FindAllCells(war);
-			Cell[] ret = new Cell[cells.Length];
-			int j = 0;
-			for (int i = 0; i < cells.Length; i++){
-				Cell cell = cells[i];
-				if (cell.pos.x == pos.x -1 || cell.pos.x == pos.x + 1 ){
-					if(cell.pos.y == pos.y - 1 || cell.pos.y == pos.y){
-						ret[j] = cell;
-						++j;
-					}
-				}
-			}
-			return ret;
-		}
-
-
-
-		private static bool Register (BigInteger warID,byte[] address, byte color){
-			War war = GetWar(warID);
-
-			if(IsUserInWar(war,address)){
-				return false;
-			}
-			else{
-				if(war.users.Length >= Const.limitPlayer){
-					return false;
-				}
-				else{
-					User user = new User();
-                    user.address = address;
-                    user.color = color;
-
-					war.users[war.users.Length] = new BigInteger(user.address) ;
-					return true;
-				}
-
-			}
-
-            
-		}
-
-		private static BigInteger Move(BigInteger warID, byte[] address,byte[] positions){
-			//TODO
-			return 0;
-		}
-        
-		private static BigInteger AwardSurvive (User user){
-			//TODO
-            return 1000;
-		}
-        
-		private static BigInteger AwardKill(Cell killed){
-			//TODO
-            return 1000;
-		}
-
-		private static BigInteger AwardAbsorb(Cell cell){
-			//TODO
-			return 1000;
-		}
-
-
-       
-        
-		public static object Main (string op, params object[] args){
-			if (Runtime.Trigger == TriggerType.Application)
-            {
-                if (op == "register")
+                if (op == "buyCard")   //Purchase a card with a level
                 {
-					BigInteger warID = (BigInteger)args[0];
-					byte[] address = (byte[])args[1];
-					byte color = ((byte[])args[2])[0];
-					return Register(warID,address, color);
+                    BigInteger level = (BigInteger)args[1];
+                    return buyCard(level);
                 }
-				if( op == "move"){
-					BigInteger warID = (BigInteger)args[0];
-					byte[] address = (byte[])args[1];
-					byte[] positions = (byte[])args[2];
-					return Move(warID, address, positions);
-				}
-				return false;
+
+
+                return false;
             }
-			else{
-				return false;
-			}
-		}
-
-
-		public static War GetWar(BigInteger warId)
-        {
-			//[TODO]
-			return new War();
+            else
+            {
+                return false;
+            }
         }
 
-		public static User GetUser(War war, BigInteger userId){
-			//[TODO]
-			return new User();
-		}
 
-		public static Cell GetCell(Pos pos){
-			//[TODO]
-			return new Cell();
-		}
+
+        public static byte[] buyCard(BigInteger level)
+        {
+            BigInteger price = 10 * level;
+            byte[] acc = GetTransSender();
+            BigInteger nowTokens = GetToken(acc);
+            if (nowTokens >= price)
+            {
+                SetToken(acc, nowTokens - price);
+                Card card = new Card
+                {
+                    id = GetTxHashForRandomness(),
+                    lvl = level,
+                    ownerId = acc
+                };
+                Storage.Put(Storage.CurrentContext, "c" + card.id, card.Serialize());
+                return card.id;
+            }
+            else
+            {
+                return new byte[0];
+            }
+
+        }
+
+        public static bool BuyToken()
+        {
+            byte[] account = GetTransSender();
+            BigInteger numGASAttached = GetGASAttached();
+            BigInteger numToken = numGASAttached * TokenPerGas;
+            BigInteger origToken = GetToken(account);
+
+            Storage.Put(Storage.CurrentContext, "t" + account.AsString(), (origToken + numToken).AsByteArray().AsString());
+            return true;
+        }
+
+        public static BigInteger GetToken(byte[] account)
+        {
+            return Storage.Get(Storage.CurrentContext, "t" + account.AsString()).AsBigInteger();
+        }
+
+        public static void SetToken(byte[] account, BigInteger amount)
+        {
+            Storage.Put(Storage.CurrentContext, "t" + account.AsString(), amount.AsByteArray().AsString());
+        }
+
+        public static Card GetCard(byte[] id)
+        {
+            return (Card)Storage.Get(Storage.CurrentContext, "c" + id).Deserialize();
+        }
     }
 }
